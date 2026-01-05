@@ -1,0 +1,165 @@
+<html lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 10 10%22><text y=%22.9em%22 font-size=%229%22>👍</text></svg>" />
+  <title>KQ Attendance CSV Maker</title>
+  <!-- from http://github.com/kevquirk/simple.css -->
+  <link rel="stylesheet" href="https://unpkg.com/simpledotcss/simple.css" />
+  <style>
+    /* make the GitHub icon a normal size */
+    .icon {
+        vertical-align: sub;
+        padding-right: .25rem;
+        display: inline-block;
+        width: 1em;
+        height: 1.3em;
+        margin-right: 0.2rem;
+        stroke-width: 0;
+        stroke: currentColor;
+        fill: currentColor;
+    }
+
+    /* fix some weirdness with buttons in simple.css */
+    a.button,
+    input[type="submit"],
+    input[type="reset"],
+    input[type="button"] {
+      padding: .5em;
+    }
+    @media only screen and (max-width: 720px) {
+      button, a.button, .button {
+        text-align: center;
+        width: 100%;
+      }
+    }
+
+    /* my own styles */
+    textarea {
+      min-height: 10rem;
+      /* might want to add this to simple.css for :not[cols] */
+      resize: vertical;
+    }
+    textarea::placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    p {
+      text-wrap: pretty;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      text-wrap: balance;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>KQ Attendance CSV Maker</h1>
+    <p>A web app to transform the message reaction CSV into the attendance CSV.</p>
+  </header>
+  <main>
+    <form action="javascript:void(0);">
+      <!-- TODO: looks bad on mobile -->
+      <fieldset>
+      <legend>Discord Id to server nickname mapping</legend>
+      <textarea name="content" placeholder="Paste or drop CSV data or file"></textarea>
+      <input type="submit"value="Use Text" />
+      <label class="button">Use Local File<input type="file" style="display: none" accept="text/*" /></label>
+      </fieldset>
+    </form>
+  </main>
+  <footer>
+    <nav>
+      <a href="https://github.com/geophree/kq_attendance_csv"><svg class="icon" viewBox="0 0 32 32"><path d="M16 0.395c-8.836 0-16 7.163-16 16 0 7.069 4.585 13.067 10.942 15.182 0.8 0.148 1.094-0.347 1.094-0.77 0-0.381-0.015-1.642-0.022-2.979-4.452 0.968-5.391-1.888-5.391-1.888-0.728-1.849-1.776-2.341-1.776-2.341-1.452-0.993 0.11-0.973 0.11-0.973 1.606 0.113 2.452 1.649 2.452 1.649 1.427 2.446 3.743 1.739 4.656 1.33 0.143-1.034 0.558-1.74 1.016-2.14-3.554-0.404-7.29-1.777-7.29-7.907 0-1.747 0.625-3.174 1.649-4.295-0.166-0.403-0.714-2.030 0.155-4.234 0 0 1.344-0.43 4.401 1.64 1.276-0.355 2.645-0.532 4.005-0.539 1.359 0.006 2.729 0.184 4.008 0.539 3.054-2.070 4.395-1.64 4.395-1.64 0.871 2.204 0.323 3.831 0.157 4.234 1.026 1.12 1.647 2.548 1.647 4.295 0 6.145-3.743 7.498-7.306 7.895 0.574 0.497 1.085 1.47 1.085 2.963 0 2.141-0.019 3.864-0.019 4.391 0 0.426 0.288 0.925 1.099 0.768 6.354-2.118 10.933-8.113 10.933-15.18 0-8.837-7.164-16-16-16z"></path></svg>GitHub</a>
+    </nav>
+  </footer>
+  <script type="module">
+    // accept pasted, dropped, or file-selected text or files.
+    const form = document.querySelector('form');
+    const processItem = async (item, form) => {
+      if (item.kind === 'file') await processFile(item.getAsFile(), form);
+      if (item.kind === 'string') {
+        const text = await new Promise((res) => item.getAsString(res));
+        processText(text, form);
+      }
+    };
+    const processFile = async (file, form) => {
+      processText(await file.text(), form);
+    };
+    const processText = (text, form) => {
+      form.content.value = text;
+      form.requestSubmit();
+    }
+    // TODO: check for (save to) localStorage?
+    // TODO: support google sheets
+    // TODO: submit event handling
+    // TODO: https://github.com/colinaut/action-table for tables
+
+    const findBestItem = (dataTransfer) => {
+      // "CSV"-like mime types:
+      // text/csv
+      // application/csv
+      // text/comma-separated-values
+      // text/tab-separated-values
+
+      let index = -1;
+      let best = { index, isFile: false, isText: false, isCsv: false };
+      for (const i of dataTransfer.items) {
+        index++;
+        const isFile = i.kind === 'file';
+        if (!isFile && i.kind !== 'string') continue;
+        const current = {
+          index,
+          isFile,
+          isText: i.type.startsWith('text'),
+          isCsv: !!i.type.match(
+            '^(text|application)/(csv|(comma|tab)-separated-values)'
+          ),
+        };
+        // if there are any files, ignore non-files
+        if (best.isFile != current.isFile) {
+          if (current.isFile) best = current;
+          continue;
+        }
+        if (best.isCsv != current.isCsv) {
+          if (current.isCsv) best = current;
+          continue;
+        }
+        if (!best.isText && current.isText) best = current;
+      }
+      if (best.index != -1 && (best.isText || best.isCsv)) {
+        return dataTransfer.items[best.index];
+      }
+      return null;
+    };
+
+    form.addEventListener('dragover', e => {
+      const bestItem = findBestItem(e.dataTransfer);
+      if (!bestItem) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+    });
+
+    form.addEventListener('drop', e => {
+      e.preventDefault();
+      const bestItem = findBestItem(e.dataTransfer);
+      if (!bestItem) return;
+      processItem(bestItem, e.currentTarget.closest('form'));
+    });
+
+    form.addEventListener('paste', e => {
+      const bestItem = findBestItem(e.clipboardData);
+      if (bestItem?.kind !== 'file') return;
+      e.preventDefault();
+      processItem(bestItem, e.currentTarget.closest('form'));
+    });
+
+    const fileInput = form.querySelector('input[type=file]');
+    fileInput.addEventListener('change', e => {
+      processFile(e.target.files[0], e.currentTarget.closest('form'));
+    });
+  </script>
+</body>
+</html>
