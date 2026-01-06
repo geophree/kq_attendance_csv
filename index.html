@@ -34,10 +34,138 @@
       }
     }
 
+    /* turn off zebra striping of tables */
+    tr:nth-child(even) {
+      background-color: inherit;
+    }
+
+    /* make action-table work better with simple.css */
+    action-table th > button {
+      text-align: left;
+      border: none;
+      border-radius: 0;
+      /*
+      background-color: inherit;
+      color: inherit;
+      &:hover {
+        color: var(--accent-text);
+      }
+      */
+      margin: 0;
+      min-width: 100%;
+    }
+
+    action-table th:has(> button) {
+      padding: 0;
+    }
+
+    action-table th button {
+      display: flex;
+    }
+
+    action-table :where(th button)::after {
+      content: "⭥";
+      float: right;
+      opacity: .3;
+    }
+
+    action-table :where(th[aria-sort="descending"] button)::after {
+      content: "⭣";
+      opacity: 1;
+    }
+
+    action-table :where(th[aria-sort="ascending"] button)::after {
+      content: "⭡";
+      opacity: 1;
+    }
+
+    action-table :where(
+        th[aria-sort$="ing"] button,
+        th[aria-sort$="ing"]:has(button)
+      ) {
+      background-color: var(--accent-hover);
+    }
+
+    action-table .sorted {
+      background-color: var(--accent-bg);
+    }
+
+    action-table {
+      position: relative;
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+
+      /* match action-table styles */
+      & .title, & .controls {
+        overflow: auto;
+        width: 100%;
+        font-weight: bold;
+        background-color: var(--accent);
+        border: var(--border-width) solid var(--border);
+        padding: .5rem;
+        color: var(--accent-text);
+        font-size: medium; /* TODO: hack? */
+      }
+
+      & .title input[type="search"] {
+        float: right;
+        margin: 0;
+        padding: .25em;
+
+        &::placeholder {
+          float: left;
+        }
+
+        &:placeholder-shown:not(:focus) {
+          width: 2rem;
+        }
+      }
+
+      & .controls {
+        & label.expanded {
+          float: right;
+          &::after {
+            content: "▼";
+          }
+          &:has(:checked)::after {
+            content: "▲";
+          }
+        }
+      }
+      &:has(label.expanded :checked) .scroller {
+        max-height: none;
+      }
+    }
+
+    action-table .scroller {
+      & tfoot th, & caption {
+        background-color: var(--accent);
+        color: var(--accent-text);
+      }
+
+      overflow: auto;
+      min-width: 100%;
+      min-height: 10rem;
+      max-height: 50vh;
+      width: fit-content;
+      max-width: 100%;
+
+      & table {
+        min-width: 100%;
+        margin: 0;
+      }
+
+      & thead {
+        position: sticky;
+        top: calc(-1 * var(--border-width));
+      }
+    }
+
     /* my own styles */
     textarea {
       min-height: 10rem;
-      /* might want to add this to simple.css for :not[cols] */
+      /* might want to add this to simple.css for :not([cols]) */
       resize: vertical;
     }
     textarea::placeholder {
@@ -60,6 +188,38 @@
     <p>A web app to transform the message reaction CSV into the attendance CSV.</p>
   </header>
   <main>
+    <action-table>
+      <div class="title">
+        Discord Id to Server Nickname
+        <action-table-filters>
+          <input type="search" name="action-table" placeholder="🔍" />
+        </action-table-filters>
+      </div>
+      <div class="scroller">
+        <table>
+          <thead><th>discordUserId</th><th>discordUserId2</th><th>serverNickname</th></thead>
+          <tbody>
+            <tr><td>587725272850366464</td><td>587725272850366464</td><td>dangief</td></tr>
+            <tr><td>349002497823604749</td><td>349002497823604749</td><td>2kool4u2k9</td></tr>
+            <tr><td>334551284860583937</td><td>334551284860583937</td><td>aaron</td></tr>
+            <tr><td>187409274157137920</td><td>187409274157137920</td><td>Abby [bmore]</td></tr>
+            <tr><td>109082939316269056</td><td>109082939316269056</td><td>Agador</td></tr>
+            <tr><td>204019581654663170</td><td>204019581654663170</td><td>Amphibious Mommy Milkers</td></tr>
+            <tr><td>148995687059685376</td><td>148995687059685376</td><td>Andy</td></tr>
+            <tr><td>176849766653755392</td><td>176849766653755392</td><td>antipode</td></tr>
+            <tr><td>205161308553871360</td><td>205161308553871360</td><td>anxpara</td></tr>
+            <tr><td>478681860084465665</td><td>478681860084465665</td><td>Aquafox - Sam</td></tr>
+            <tr><td>331647057125441546</td><td>331647057125441546</td><td>Arguas (Ryan)</td></tr>
+            <tr><td>174669097039167489</td><td>174669097039167489</td><td>Arioid</td></tr>
+            <tr><td>398656868282662914</td><td>398656868282662914</td><td>Asher</td></tr>
+            <tr><td>310786667030249472</td><td>310786667030249472</td><td>atlas ⁶⁶⁶</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="controls">
+        <label class="expanded"><input type="checkbox" style="display: none" /></label>
+      </div>
+    </action-table>
     <form action="javascript:void(0);">
       <!-- TODO: looks bad on mobile -->
       <fieldset>
@@ -75,23 +235,57 @@
       <a href="https://github.com/geophree/kq_attendance_csv"><svg class="icon" viewBox="0 0 32 32"><path d="M16 0.395c-8.836 0-16 7.163-16 16 0 7.069 4.585 13.067 10.942 15.182 0.8 0.148 1.094-0.347 1.094-0.77 0-0.381-0.015-1.642-0.022-2.979-4.452 0.968-5.391-1.888-5.391-1.888-0.728-1.849-1.776-2.341-1.776-2.341-1.452-0.993 0.11-0.973 0.11-0.973 1.606 0.113 2.452 1.649 2.452 1.649 1.427 2.446 3.743 1.739 4.656 1.33 0.143-1.034 0.558-1.74 1.016-2.14-3.554-0.404-7.29-1.777-7.29-7.907 0-1.747 0.625-3.174 1.649-4.295-0.166-0.403-0.714-2.030 0.155-4.234 0 0 1.344-0.43 4.401 1.64 1.276-0.355 2.645-0.532 4.005-0.539 1.359 0.006 2.729 0.184 4.008 0.539 3.054-2.070 4.395-1.64 4.395-1.64 0.871 2.204 0.323 3.831 0.157 4.234 1.026 1.12 1.647 2.548 1.647 4.295 0 6.145-3.743 7.498-7.306 7.895 0.574 0.497 1.085 1.47 1.085 2.963 0 2.141-0.019 3.864-0.019 4.391 0 0.426 0.288 0.925 1.099 0.768 6.354-2.118 10.933-8.113 10.933-15.18 0-8.837-7.164-16-16-16z"></path></svg>GitHub</a>
     </nav>
   </footer>
+  <script type="module" src="https://unpkg.com/@colinaut/action-table/dist/index.js"></script>
   <script type="module">
+    import Csv from "./papaparse.js";
     // accept pasted, dropped, or file-selected text or files.
     const form = document.querySelector('form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const { data } = Csv.parse(form.content.value);
+
+      if (data.length == 0) return;
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      for (const cell of data[0]) {
+        const th = document.createElement('th');
+        th.textContent = cell;
+        thead.appendChild(th);
+      }
+      table.appendChild(thead);
+
+      if (data.length > 1) {
+        const tbody = document.createElement('tbody');
+        for (let i = 1; i < data.length; i++) {
+          const tr = document.createElement('tr');
+          for (const cell of data[i]) {
+            const td = document.createElement('td');
+            td.textContent = cell
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+      }
+      const actionTable = document.createElement('action-table');
+      actionTable.appendChild(table);
+      form.after(actionTable);
+    });
     const processItem = async (item, form) => {
-      if (item.kind === 'file') await processFile(item.getAsFile(), form);
+      if (!item) return;
+      if (item.kind === 'file') item = item.getAsFile();
       if (item.kind === 'string') {
-        const text = await new Promise((res) => item.getAsString(res));
-        processText(text, form);
+        item = await new Promise((res) => item.getAsString(res));
+      }
+      if (item instanceof Blob) item = await item.text();
+      if (typeof item === 'string') {
+        form.content.value = item;
+        form.requestSubmit();
+      } else {
+        console.error({message: 'item not DataTransferItem, Blob/File, or string', item});
       }
     };
-    const processFile = async (file, form) => {
-      processText(await file.text(), form);
-    };
-    const processText = (text, form) => {
-      form.content.value = text;
-      form.requestSubmit();
-    }
     // TODO: check for (save to) localStorage?
     // TODO: support google sheets
     // TODO: submit event handling
@@ -158,7 +352,9 @@
 
     const fileInput = form.querySelector('input[type=file]');
     fileInput.addEventListener('change', e => {
-      processFile(e.target.files[0], e.currentTarget.closest('form'));
+      const file = e.target.files[0];
+      e.target.value = null;
+      processItem(file, e.currentTarget.closest('form'));
     });
   </script>
 </body>
