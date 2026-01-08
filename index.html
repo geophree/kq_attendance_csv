@@ -73,18 +73,18 @@
       }
 
       :where(th button)::after {
-        content: "⭥";
+        content: "⭥" / "";
         margin-left: auto;
         opacity: .3;
       }
 
       :where(th[aria-sort="descending"] button)::after {
-        content: "⭣";
+        content: "⭣" / "";
         opacity: 1;
       }
 
       :where(th[aria-sort="ascending"] button)::after {
-        content: "⭡";
+        content: "⭡" / "";
         opacity: 1;
       }
 
@@ -219,7 +219,7 @@
       <div class="title">
         Discord Id to Server Nickname
         <action-table-filters>
-          <input type="search" name="action-table" placeholder="🔍" />
+          <input type="search" name="action-table" placeholder="🔍" aria-label="search table"/>
         </action-table-filters>
       </div>
       <div class="scroller">
@@ -243,13 +243,16 @@
           </tbody>
         </table>
       </div>
-      <form class="controls">
-        <button name="copy"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-200.6c0-17.4-7.1-34.1-19.7-46.2L370.6 17.8C358.7 6.4 342.8 0 326.3 0L192 0zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-16-64 0 0 16-192 0 0-256 16 0 0-64-16 0z"/></svg></button>
-        <button name="download"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 210.7-41.4-41.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 242.7 256 32zM64 320c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-46.9 0-56.6 56.6c-31.2 31.2-81.9 31.2-113.1 0L110.9 320 64 320zm304 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg></button>
-        <button name="add_row"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
-        <button name="edit"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L368 46.1 465.9 144 490.3 119.6c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L432 177.9 334.1 80 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"/></svg></button>
-        <button name="save"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"/></svg></button>
-        <label class="expanded button"><input type="checkbox" style="display: none" /></label>
+      <action-table-no-results>
+        No results matched.
+      </action-table-no-results>
+      <form class="controls" action="javascript:void(0);">
+        <button name="copy" aria-label="copy table to clipboard"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-200.6c0-17.4-7.1-34.1-19.7-46.2L370.6 17.8C358.7 6.4 342.8 0 326.3 0L192 0zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-16-64 0 0 16-192 0 0-256 16 0 0-64-16 0z"/></svg></button>
+        <button name="download" aria-label="download table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 210.7-41.4-41.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 242.7 256 32zM64 320c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-46.9 0-56.6 56.6c-31.2 31.2-81.9 31.2-113.1 0L110.9 320 64 320zm304 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg></button>
+        <button name="add_row" aria-label="add row"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
+        <button name="edit" aria-label="edit table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L368 46.1 465.9 144 490.3 119.6c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L432 177.9 334.1 80 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"/></svg></button>
+        <button name="save" aria-label="save changes to table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"/></svg></button>
+        <label class="expanded button" aria-label="expand or contract table"><input type="checkbox" style="display: none" /></label>
       </form>
     </action-table>
     <form action="javascript:void(0);">
@@ -268,6 +271,116 @@
     </nav>
   </footer>
   <script type="module" src="https://unpkg.com/@colinaut/action-table/dist/index.js"></script>
+  <script type="module">
+    import Csv from "./papaparse.js";
+
+    const controls = document.querySelector('action-table form.controls');
+    const getData = (table) => {
+      console.log({table});
+      if (table && !table.matches('table')) {
+        table = table?.querySelector('table');
+      }
+      console.log({table});
+      if (!table?.matches('table')) return;
+      console.log({table});
+      const data = [];
+      for (const row of table.querySelectorAll('thead > tr, tbody > tr')) {
+        data.push([...row.children].map((el) => el.textContent));
+      }
+      return data;
+    };
+    controls.copy.addEventListener('click', async (e) => {
+      const data = getData(e.target.closest('action-table'));
+      console.log(data);
+      // todo: choose TSV?
+      const csv = Csv.unparse(data);
+      try {
+        await navigator.clipboard.writeText(csv);
+        alert('Copied data to clipboard');
+      } catch {
+        alert('Failed to copy data to clipboard');
+      }
+    });
+    controls.download.addEventListener('click', (e) => {
+      const data = getData(e.target.closest('action-table'));
+      console.log(data);
+      const csv = Csv.unparse(data);
+      // todo: choose TSV?
+      var blob = new Blob([csv], { 'type': 'text/csv' });
+      var a = document.createElement('a');
+      a.href = window.URL.createObjectURL(blob);
+      a.download = 'data.csv'; // TODO: better filename
+      a.click();
+      setTimeout(() => window.URL.revokeObjectURL(a.href), 0);
+    });
+    controls.add_row.addEventListener('click', (e) => {
+      const actionTable = e.target.closest('action-table');
+      const table = actionTable.querySelector('table');
+      const ths = table.querySelectorAll('thead th');
+      const headers = [...ths].map((el) => el.textContent);
+
+      const cec = (name) => (text) => {
+        const el = document.createElement(name);
+        if (text) el.textContent = text;
+        return el;
+      }
+      const dialog = cec('dialog')();
+      dialog.setAttribute('closedby', 'any');
+      dialog.addEventListener('close', (e) => e.target.remove());
+      const form = cec('form')();
+      form.setAttribute('action', 'javascript:void(0);');
+      form.append(...headers.map(header => {
+        const label = cec('label')(header);
+        const input = cec('input')();
+        input.setAttribute('type', 'text');
+        input.value = 1; // TODO: REMOVE!!!!
+        label.append(' ', input);
+        return label;
+      }));
+      const add = cec('button')('Add');
+      const done = cec('button')('Done');
+      done.setAttribute('type', 'button');
+      done.addEventListener('click', (e) => {
+        e.target.closest('dialog').close();
+      });
+      form.append(add, ' ', done);
+      form.addEventListener('submit', (e) => {
+        const fields = e.target.querySelectorAll('input[type="text"]');
+        const tr = cec('tr')();
+        // make sure action-table knows about the row
+        actionTable.rows.push(tr);
+        tr.append(...[...fields].map((el) => cec('td')(el.value)));
+        table.querySelector('tbody').append(tr);
+        // make sure action-table knows something changed
+        const changeEvent = new Event('action-table-update', { bubbles: true });
+        tr.firstChild.dispatchEvent(changeEvent);
+        form.reset();
+        fields[0].focus();
+      });
+      dialog.append(form);
+      document.body.append(dialog);
+      dialog.showModal();
+    });
+    controls.edit.addEventListener('click', (e) => {
+      const actionTable = e.target.closest('action-table');
+      actionTable.classList.add('editing');
+      const table = actionTable.querySelector('table');
+      for (let cell of table.querySelectorAll('th, td')) {
+        while (cell.children.length) cell = cell.children[0];
+        cell.contentEditable = 'plaintext-only';
+      }
+    });
+    controls.save.addEventListener('click', (e) => {
+      const actionTable = e.target.closest('action-table');
+      actionTable.classList.remove('editing');
+      const table = actionTable.querySelector('table');
+      for (let cell of table.querySelectorAll('th, td')) {
+        while (cell.children.length) cell = cell.children[0];
+        cell.contentEditable = false;
+      }
+      // TODO: ACTUALLY SAVE!!!
+    });
+  </script>
   <script type="module">
     import Csv from "./papaparse.js";
     // accept pasted, dropped, or file-selected text or files.
