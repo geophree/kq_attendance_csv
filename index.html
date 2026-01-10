@@ -15,7 +15,7 @@
         display: inline-block;
         width: 1em;
         height: 1.3em;
-        margin-right: 0.2rem;
+        /* margin-right: 0.2rem;*/
         stroke-width: 0;
         stroke: currentColor;
         fill: currentColor;
@@ -146,12 +146,9 @@
         }
       }
 
-      &:not(.editing) .controls [name="save"] {
-        display: none;
-      }
-
       &.editing .controls [name="edit"] {
-        display: none;
+        background-color: var(--bg);
+        color: var(--text);
       }
     }
 
@@ -170,7 +167,17 @@
         /* always show header */
         thead {
           position: sticky;
-          top: calc(-1 * var(--border-width));
+          top: 0;
+          td, th {
+            border-top: none;
+            border-bottom: none;
+          }
+        }
+
+        tbody {
+          tr:last-of-type :is(td, th) {
+            border-bottom: none;
+          }
         }
       }
 
@@ -250,8 +257,7 @@
         <button name="copy" aria-label="copy table to clipboard"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-200.6c0-17.4-7.1-34.1-19.7-46.2L370.6 17.8C358.7 6.4 342.8 0 326.3 0L192 0zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-16-64 0 0 16-192 0 0-256 16 0 0-64-16 0z"/></svg></button>
         <button name="download" aria-label="download table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 210.7-41.4-41.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 242.7 256 32zM64 320c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-46.9 0-56.6 56.6c-31.2 31.2-81.9 31.2-113.1 0L110.9 320 64 320zm304 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg></button>
         <button name="add_row" aria-label="add row"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
-        <button name="edit" aria-label="edit table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L368 46.1 465.9 144 490.3 119.6c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L432 177.9 334.1 80 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"/></svg></button>
-        <button name="save" aria-label="save changes to table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"/></svg></button>
+        <button name="edit" aria-label="toggle edit table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L368 46.1 465.9 144 490.3 119.6c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L432 177.9 334.1 80 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"/></svg></button>
         <label class="expanded button" aria-label="expand or contract table"><input type="checkbox" style="display: none" /></label>
       </form>
     </action-table>
@@ -267,33 +273,31 @@
   </main>
   <footer>
     <nav>
-      <a href="https://github.com/geophree/kq_attendance_csv"><svg class="icon" viewBox="0 0 32 32"><path d="M16 0.395c-8.836 0-16 7.163-16 16 0 7.069 4.585 13.067 10.942 15.182 0.8 0.148 1.094-0.347 1.094-0.77 0-0.381-0.015-1.642-0.022-2.979-4.452 0.968-5.391-1.888-5.391-1.888-0.728-1.849-1.776-2.341-1.776-2.341-1.452-0.993 0.11-0.973 0.11-0.973 1.606 0.113 2.452 1.649 2.452 1.649 1.427 2.446 3.743 1.739 4.656 1.33 0.143-1.034 0.558-1.74 1.016-2.14-3.554-0.404-7.29-1.777-7.29-7.907 0-1.747 0.625-3.174 1.649-4.295-0.166-0.403-0.714-2.030 0.155-4.234 0 0 1.344-0.43 4.401 1.64 1.276-0.355 2.645-0.532 4.005-0.539 1.359 0.006 2.729 0.184 4.008 0.539 3.054-2.070 4.395-1.64 4.395-1.64 0.871 2.204 0.323 3.831 0.157 4.234 1.026 1.12 1.647 2.548 1.647 4.295 0 6.145-3.743 7.498-7.306 7.895 0.574 0.497 1.085 1.47 1.085 2.963 0 2.141-0.019 3.864-0.019 4.391 0 0.426 0.288 0.925 1.099 0.768 6.354-2.118 10.933-8.113 10.933-15.18 0-8.837-7.164-16-16-16z"></path></svg>GitHub</a>
+      <a href="https://github.com/geophree/kq_attendance_csv"><svg class="icon" viewBox="0 0 32 32"><path d="M16 0.395c-8.836 0-16 7.163-16 16 0 7.069 4.585 13.067 10.942 15.182 0.8 0.148 1.094-0.347 1.094-0.77 0-0.381-0.015-1.642-0.022-2.979-4.452 0.968-5.391-1.888-5.391-1.888-0.728-1.849-1.776-2.341-1.776-2.341-1.452-0.993 0.11-0.973 0.11-0.973 1.606 0.113 2.452 1.649 2.452 1.649 1.427 2.446 3.743 1.739 4.656 1.33 0.143-1.034 0.558-1.74 1.016-2.14-3.554-0.404-7.29-1.777-7.29-7.907 0-1.747 0.625-3.174 1.649-4.295-0.166-0.403-0.714-2.030 0.155-4.234 0 0 1.344-0.43 4.401 1.64 1.276-0.355 2.645-0.532 4.005-0.539 1.359 0.006 2.729 0.184 4.008 0.539 3.054-2.070 4.395-1.64 4.395-1.64 0.871 2.204 0.323 3.831 0.157 4.234 1.026 1.12 1.647 2.548 1.647 4.295 0 6.145-3.743 7.498-7.306 7.895 0.574 0.497 1.085 1.47 1.085 2.963 0 2.141-0.019 3.864-0.019 4.391 0 0.426 0.288 0.925 1.099 0.768 6.354-2.118 10.933-8.113 10.933-15.18 0-8.837-7.164-16-16-16z"></path></svg> GitHub</a>
     </nav>
   </footer>
   <script type="module" src="https://unpkg.com/@colinaut/action-table/dist/index.js"></script>
   <script type="module">
     import Csv from "./papaparse.js";
 
-    const controls = document.querySelector('action-table form.controls');
-    const getData = (table) => {
-      console.log({table});
-      if (table && !table.matches('table')) {
-        table = table?.querySelector('table');
-      }
-      console.log({table});
-      if (!table?.matches('table')) return;
-      console.log({table});
+    const actionTable = document.querySelector('action-table');
+    const controls = actionTable.querySelector('form.controls');
+    actionTable.getData = () => {
+      const table = actionTable.querySelector('table');
+      if (!table) return;
       const data = [];
       for (const row of table.querySelectorAll('thead > tr, tbody > tr')) {
         data.push([...row.children].map((el) => el.textContent));
       }
       return data;
     };
-    controls.copy.addEventListener('click', async (e) => {
-      const data = getData(e.target.closest('action-table'));
-      console.log(data);
+    actionTable.getCsv = () => {
+      const data = actionTable.getData();
       // todo: choose TSV?
-      const csv = Csv.unparse(data);
+      return Csv.unparse(data);
+    };
+    controls.copy.addEventListener('click', async (e) => {
+      const csv = actionTable.getCsv();
       try {
         await navigator.clipboard.writeText(csv);
         alert('Copied data to clipboard');
@@ -302,9 +306,7 @@
       }
     });
     controls.download.addEventListener('click', (e) => {
-      const data = getData(e.target.closest('action-table'));
-      console.log(data);
-      const csv = Csv.unparse(data);
+      const csv = actionTable.getCsv();
       // todo: choose TSV?
       var blob = new Blob([csv], { 'type': 'text/csv' });
       var a = document.createElement('a');
@@ -363,22 +365,13 @@
     });
     controls.edit.addEventListener('click', (e) => {
       const actionTable = e.target.closest('action-table');
-      actionTable.classList.add('editing');
       const table = actionTable.querySelector('table');
+      const isEdit = actionTable.classList.toggle('editing');
+      const contentEditableValue = (isEdit) ? 'plaintext-only' : false;
       for (let cell of table.querySelectorAll('th, td')) {
         while (cell.children.length) cell = cell.children[0];
-        cell.contentEditable = 'plaintext-only';
+        cell.contentEditable = contentEditableValue;
       }
-    });
-    controls.save.addEventListener('click', (e) => {
-      const actionTable = e.target.closest('action-table');
-      actionTable.classList.remove('editing');
-      const table = actionTable.querySelector('table');
-      for (let cell of table.querySelectorAll('th, td')) {
-        while (cell.children.length) cell = cell.children[0];
-        cell.contentEditable = false;
-      }
-      // TODO: ACTUALLY SAVE!!!
     });
   </script>
   <script type="module">
