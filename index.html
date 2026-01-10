@@ -494,5 +494,49 @@
       processItem(file, e.currentTarget.closest('form'));
     });
   </script>
+  <script type="module">
+    let localStorage;
+    try {
+      localStorage = window.localStorage;
+      localStorage.removeItem('test');
+      if (localStorage.getItem('test')) throw 'fail';
+      localStorage.setItem('test', 'test');
+      if (localStorage.getItem('test') != 'test') throw 'fail';
+      localStorage.removeItem('test');
+    } catch {
+      console.log('Failed to access localStorage.');
+      localStorage = null;
+    }
+    if (localStorage) {
+      const localStorageKey = 'nickname_map_csv';
+      const mainForm = document.querySelector('form:has(textarea)');
+      const storeData = (data) => {
+        localStorage.setItem(localStorageKey, data)
+      };
+      const data = localStorage.getItem(localStorageKey);
+      if (data) {
+        mainForm.content.value = data;
+        mainForm.requestSubmit();
+      }
+      mainForm.addEventListener('submit', (e) => {
+        storeData(e.target.content.value);
+      });
+
+      const actionTable = document.querySelector('action-table');
+      actionTable.addEventListener('focusout', (e) => {
+        if (!event.target.contentEditable) return;
+        setTimeout(() => {
+          const csv = actionTable.getCsv();
+          if (csv) storeData(csv);
+        }, 0);
+      });
+      actionTable.addEventListener('action-table-update', (e) => {
+        setTimeout(() => {
+          const csv = actionTable.getCsv();
+          if (csv) storeData(csv);
+        }, 0);
+      });
+    }
+  </script>
 </body>
 </html>
