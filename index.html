@@ -214,6 +214,25 @@
     h1, h2, h3, h4, h5, h6 {
       text-wrap: balance;
     }
+
+    /* section styling */
+    section {
+      &[data-stage="csv"] {
+        button[name="csv_input"] {
+          display: none;
+        }
+
+        super-table {
+          display: none;
+        }
+      }
+
+      &[data-stage="table"] {
+        csv-input {
+          display: none;
+        }
+      }
+    }
   </style>
 </head>
 <body>
@@ -222,7 +241,7 @@
     <p>A web app to transform the message reaction CSV into the attendance CSV.</p>
   </header>
   <main>
-    <action-table>
+    <action-table style="display: none">
       <div class="title">
         Discord Id to Server Nickname
         <action-table-filters>
@@ -261,15 +280,16 @@
         <label class="expanded button" aria-label="expand or contract table"><input type="checkbox" style="display: none" /></label>
       </form>
     </action-table>
-    <form action="javascript:void(0);">
-      <!-- TODO: looks bad on mobile -->
-      <fieldset>
-      <legend>Discord Id to server nickname mapping</legend>
-      <textarea name="content" placeholder="Paste or drop CSV data or file"></textarea>
-      <input type="submit"value="Use Text" />
-      <label class="button">Use Local File<input type="file" style="display: none" accept="text/*" /></label>
-      </fieldset>
-    </form>
+    <section data-filename="discord_id_to_nickname" data-stage="csv">
+      <h2>Nickname Map</h2>
+      <button name="csv_input">Back to Input</button>
+      <csv-input></csv-input>
+    </section>
+    <section data-filename="message_reactions" data-stage="csv">
+      <h2>Message Reactions</h2>
+      <button name="csv_input">Back to Input</button>
+      <csv-input></csv-input>
+    </section>
   </main>
   <footer>
     <nav>
@@ -277,222 +297,58 @@
     </nav>
   </footer>
   <script type="module" src="https://unpkg.com/@colinaut/action-table/dist/index.js"></script>
+  <script type="module" src="./super_table.js"></script>
+  <script type="module" src="./csv_input.js"></script>
   <script type="module">
     import Csv from "./papaparse.js";
-
-    const actionTable = document.querySelector('action-table');
-    const controls = actionTable.querySelector('form.controls');
-    actionTable.getData = () => {
-      const table = actionTable.querySelector('table');
-      if (!table) return;
-      const data = [];
-      for (const row of table.querySelectorAll('thead > tr, tbody > tr')) {
-        data.push([...row.children].map((el) => el.textContent));
-      }
-      return data;
-    };
-    actionTable.getCsv = () => {
-      const data = actionTable.getData();
-      // todo: choose TSV?
-      return Csv.unparse(data);
-    };
-    controls.copy.addEventListener('click', async (e) => {
-      const csv = actionTable.getCsv();
-      try {
-        await navigator.clipboard.writeText(csv);
-        alert('Copied data to clipboard');
-      } catch {
-        alert('Failed to copy data to clipboard');
-      }
-    });
-    controls.download.addEventListener('click', (e) => {
-      const csv = actionTable.getCsv();
-      // todo: choose TSV?
-      var blob = new Blob([csv], { 'type': 'text/csv' });
-      var a = document.createElement('a');
-      a.href = window.URL.createObjectURL(blob);
-      a.download = 'data.csv'; // TODO: better filename
-      a.click();
-      setTimeout(() => window.URL.revokeObjectURL(a.href), 0);
-    });
-    controls.add_row.addEventListener('click', (e) => {
-      const actionTable = e.target.closest('action-table');
-      const table = actionTable.querySelector('table');
-      const ths = table.querySelectorAll('thead th');
-      const headers = [...ths].map((el) => el.textContent);
-
-      const cec = (name) => (text) => {
-        const el = document.createElement(name);
-        if (text) el.textContent = text;
-        return el;
-      }
-      const dialog = cec('dialog')();
-      dialog.setAttribute('closedby', 'any');
-      dialog.addEventListener('close', (e) => e.target.remove());
-      const form = cec('form')();
-      form.setAttribute('action', 'javascript:void(0);');
-      form.append(...headers.map(header => {
-        const label = cec('label')(header);
-        const input = cec('input')();
-        input.setAttribute('type', 'text');
-        input.value = 1; // TODO: REMOVE!!!!
-        label.append(' ', input);
-        return label;
-      }));
-      const add = cec('button')('Add');
-      const done = cec('button')('Done');
-      done.setAttribute('type', 'button');
-      done.addEventListener('click', (e) => {
-        e.target.closest('dialog').close();
+    const sections = document.querySelectorAll('section[data-stage]');
+    for (const section of sections) {
+      const backButton = section.querySelector('[name=csv_input]');
+      backButton.addEventListener('click', (e) => {
+        const superTable = section.querySelector('super-table');
+        const csvInput = section.querySelector('csv-input');
+        csvInput.querySelector('form').content.value = superTable.getCsv();
+        section.dataset.stage = 'csv';
+        superTable.remove();
       });
-      form.append(add, ' ', done);
-      form.addEventListener('submit', (e) => {
-        const fields = e.target.querySelectorAll('input[type="text"]');
+
+      const csvInput = section.querySelector('csv-input');
+      csvInput.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const { data } = Csv.parse(form.content.value);
+
+        if (data.length == 0) return;
+
+        const cec = (name) => (text) => {
+          const el = document.createElement(name);
+          if (text) el.textContent = text;
+          return el;
+        }
+
+        const table = cec('table')();
+        const thead = cec('thead')();
         const tr = cec('tr')();
-        // make sure action-table knows about the row
-        actionTable.rows.push(tr);
-        tr.append(...[...fields].map((el) => cec('td')(el.value)));
-        table.querySelector('tbody').append(tr);
-        // make sure action-table knows something changed
-        const changeEvent = new Event('action-table-update', { bubbles: true });
-        tr.firstChild.dispatchEvent(changeEvent);
-        form.reset();
-        fields[0].focus();
+        tr.append(...data[0].map(cec('th')));
+        thead.append(tr);
+        table.append(thead);
+
+        const tbody = cec('tbody')();
+        if (data.length > 1) {
+          for (let i = 1; i < data.length; i++) {
+            const tr = cec('tr')();
+            tr.append(...data[i].map(cec('td')));
+            tbody.appendChild(tr);
+          }
+        }
+        table.append(tbody);
+
+        const superTable = cec('super-table')();
+        superTable.append(table);
+        csvInput.after(superTable);
+        form.closest('section').dataset.stage = 'table';
       });
-      dialog.append(form);
-      document.body.append(dialog);
-      dialog.showModal();
-    });
-    controls.edit.addEventListener('click', (e) => {
-      const actionTable = e.target.closest('action-table');
-      const table = actionTable.querySelector('table');
-      const isEdit = actionTable.classList.toggle('editing');
-      const contentEditableValue = (isEdit) ? 'plaintext-only' : false;
-      for (let cell of table.querySelectorAll('th, td')) {
-        while (cell.children.length) cell = cell.children[0];
-        cell.contentEditable = contentEditableValue;
-      }
-    });
-  </script>
-  <script type="module">
-    import Csv from "./papaparse.js";
-    // accept pasted, dropped, or file-selected text or files.
-    const form = document.querySelector('form:has(textarea)');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const { data } = Csv.parse(form.content.value);
-
-      if (data.length == 0) return;
-      const cec = (name) => (text) => {
-        const el = document.createElement(name);
-        if (text) el.textContent = text;
-        return el;
-      }
-      const table = cec('table')();
-      const thead = cec('thead')();
-      thead.append(...data[0].map(cec('th')));
-      table.append(thead);
-
-      const tbody = cec('tbody')();
-      if (data.length > 1) {
-        for (let i = 1; i < data.length; i++) {
-          const tr = cec('tr')();
-          tr.append(...data[i].map(cec('td')));
-          tbody.appendChild(tr);
-        }
-      }
-      table.append(tbody);
-
-      const actionTable = cec('action-table')();
-      actionTable.append(table);
-      form.after(actionTable);
-      // use contenteditable="plaintext-only" for edit
-    });
-    const processItem = async (item, form) => {
-      if (!item) return;
-      if (item.kind === 'file') item = item.getAsFile();
-      if (item.kind === 'string') {
-        item = await new Promise((res) => item.getAsString(res));
-      }
-      if (item instanceof Blob) item = await item.text();
-      if (typeof item === 'string') {
-        form.content.value = item;
-        form.requestSubmit();
-      } else {
-        console.error({message: 'item not DataTransferItem, Blob/File, or string', item});
-      }
-    };
-    // TODO: check for (save to) localStorage?
-    // TODO: support google sheets
-    // TODO: submit event handling
-    // TODO: https://github.com/colinaut/action-table for tables
-
-    const findBestItem = (dataTransfer) => {
-      // "CSV"-like mime types:
-      // text/csv
-      // application/csv
-      // text/comma-separated-values
-      // text/tab-separated-values
-
-      let index = -1;
-      let best = { index, isFile: false, isText: false, isCsv: false };
-      for (const i of dataTransfer.items) {
-        index++;
-        const isFile = i.kind === 'file';
-        if (!isFile && i.kind !== 'string') continue;
-        const current = {
-          index,
-          isFile,
-          isText: i.type.startsWith('text'),
-          isCsv: !!i.type.match(
-            '^(text|application)/(csv|(comma|tab)-separated-values)'
-          ),
-        };
-        // if there are any files, ignore non-files
-        if (best.isFile != current.isFile) {
-          if (current.isFile) best = current;
-          continue;
-        }
-        if (best.isCsv != current.isCsv) {
-          if (current.isCsv) best = current;
-          continue;
-        }
-        if (!best.isText && current.isText) best = current;
-      }
-      if (best.index != -1 && (best.isText || best.isCsv)) {
-        return dataTransfer.items[best.index];
-      }
-      return null;
-    };
-
-    form.addEventListener('dragover', e => {
-      const bestItem = findBestItem(e.dataTransfer);
-      if (!bestItem) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "copy";
-    });
-
-    form.addEventListener('drop', e => {
-      e.preventDefault();
-      const bestItem = findBestItem(e.dataTransfer);
-      if (!bestItem) return;
-      processItem(bestItem, e.currentTarget.closest('form'));
-    });
-
-    form.addEventListener('paste', e => {
-      const bestItem = findBestItem(e.clipboardData);
-      if (bestItem?.kind !== 'file') return;
-      e.preventDefault();
-      processItem(bestItem, e.currentTarget.closest('form'));
-    });
-
-    const fileInput = form.querySelector('input[type=file]');
-    fileInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      e.target.value = null;
-      processItem(file, e.currentTarget.closest('form'));
-    });
+    }
   </script>
   <script type="module">
     let localStorage;
@@ -507,35 +363,31 @@
       console.log('Failed to access localStorage.');
       localStorage = null;
     }
-    if (localStorage) {
-      const localStorageKey = 'nickname_map_csv';
-      const mainForm = document.querySelector('form:has(textarea)');
-      const storeData = (data) => {
-        localStorage.setItem(localStorageKey, data)
-      };
-      const data = localStorage.getItem(localStorageKey);
-      if (data) {
-        mainForm.content.value = data;
-        mainForm.requestSubmit();
-      }
-      mainForm.addEventListener('submit', (e) => {
-        storeData(e.target.content.value);
-      });
 
-      const actionTable = document.querySelector('action-table');
-      actionTable.addEventListener('focusout', (e) => {
-        if (!event.target.contentEditable) return;
-        setTimeout(() => {
-          const csv = actionTable.getCsv();
+    if (localStorage) {
+      const sections = document.querySelectorAll('section[data-filename]');
+      for (const section of sections) {
+        const localStorageKey = section.dataset.filename;
+        const csvForm = section.querySelector('csv-input form');
+        const storeData = (data) => {
+          localStorage.setItem(localStorageKey, data)
+        };
+        const data = localStorage.getItem(localStorageKey);
+        if (data) {
+          csvForm.content.value = data;
+          csvForm.requestSubmit();
+        }
+
+        csvForm.addEventListener('submit', (e) => {
+          storeData(e.target.content.value);
+        });
+
+        section.addEventListener('super-table-updated', (e) => {
+          const superTable = section.querySelector('super-table');
+          const csv = superTable.getCsv();
           if (csv) storeData(csv);
-        }, 0);
-      });
-      actionTable.addEventListener('action-table-update', (e) => {
-        setTimeout(() => {
-          const csv = actionTable.getCsv();
-          if (csv) storeData(csv);
-        }, 0);
-      });
+        });
+      }
     }
   </script>
 </body>
