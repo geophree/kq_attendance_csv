@@ -241,45 +241,6 @@
     <p>A web app to transform the message reaction CSV into the attendance CSV.</p>
   </header>
   <main>
-    <action-table style="display: none">
-      <div class="title">
-        Discord Id to Server Nickname
-        <action-table-filters>
-          <input type="search" name="action-table" placeholder="🔍" aria-label="search table"/>
-        </action-table-filters>
-      </div>
-      <div class="scroller">
-        <table>
-          <thead><th>discordUserId</th><th>discordUserId2</th><th>serverNickname</th></thead>
-          <tbody>
-            <tr><td>587725272850366464</td><td>587725272850366464</td><td>dangief</td></tr>
-            <tr><td>349002497823604749</td><td>349002497823604749</td><td>2kool4u2k9</td></tr>
-            <tr><td>334551284860583937</td><td>334551284860583937</td><td>aaron</td></tr>
-            <tr><td>187409274157137920</td><td>187409274157137920</td><td>Abby [bmore]</td></tr>
-            <tr><td>109082939316269056</td><td>109082939316269056</td><td>Agador</td></tr>
-            <tr><td>204019581654663170</td><td>204019581654663170</td><td>Amphibious Mommy Milkers</td></tr>
-            <tr><td>148995687059685376</td><td>148995687059685376</td><td>Andy</td></tr>
-            <tr><td>176849766653755392</td><td>176849766653755392</td><td>antipode</td></tr>
-            <tr><td>205161308553871360</td><td>205161308553871360</td><td>anxpara</td></tr>
-            <tr><td>478681860084465665</td><td>478681860084465665</td><td>Aquafox - Sam</td></tr>
-            <tr><td>331647057125441546</td><td>331647057125441546</td><td>Arguas (Ryan)</td></tr>
-            <tr><td>174669097039167489</td><td>174669097039167489</td><td>Arioid</td></tr>
-            <tr><td>398656868282662914</td><td>398656868282662914</td><td>Asher</td></tr>
-            <tr><td>310786667030249472</td><td>310786667030249472</td><td>atlas ⁶⁶⁶</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <action-table-no-results>
-        No results matched.
-      </action-table-no-results>
-      <form class="controls" action="javascript:void(0);">
-        <button name="copy" aria-label="copy table to clipboard"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-200.6c0-17.4-7.1-34.1-19.7-46.2L370.6 17.8C358.7 6.4 342.8 0 326.3 0L192 0zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-16-64 0 0 16-192 0 0-256 16 0 0-64-16 0z"/></svg></button>
-        <button name="download" aria-label="download table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 210.7-41.4-41.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 242.7 256 32zM64 320c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-46.9 0-56.6 56.6c-31.2 31.2-81.9 31.2-113.1 0L110.9 320 64 320zm304 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg></button>
-        <button name="add_row" aria-label="add row"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
-        <button name="edit" aria-label="toggle edit table"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L368 46.1 465.9 144 490.3 119.6c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L432 177.9 334.1 80 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"/></svg></button>
-        <label class="expanded button" aria-label="expand or contract table"><input type="checkbox" style="display: none" /></label>
-      </form>
-    </action-table>
     <section data-filename="discord_id_to_nickname" data-stage="csv">
       <h2>Nickname Map</h2>
       <button name="csv_input">Back to Input</button>
@@ -289,6 +250,11 @@
       <h2>Message Reactions</h2>
       <button name="csv_input">Back to Input</button>
       <csv-input></csv-input>
+    </section>
+    <section data-name="combined">
+      <h2>Combined with Emoji columns</h2>
+      <button name="generate">Generate</button>
+      <!-- TODO: display when it is out of date? -->
     </section>
   </main>
   <footer>
@@ -300,8 +266,37 @@
   <script type="module" src="./super_table.js"></script>
   <script type="module" src="./csv_input.js"></script>
   <script type="module">
+    // TODO: make sure all rows have the same column count
+    // TODO: ignore empty lines
     import Csv from "./papaparse.js";
     const sections = document.querySelectorAll('section[data-stage]');
+
+    const cec = (name) => (text) => {
+      const el = document.createElement(name);
+      if (text) el.textContent = text;
+      return el;
+    }
+
+    const build_table = (rows) => {
+      const table = cec('table')();
+      const thead = cec('thead')();
+      const tr = cec('tr')();
+      tr.append(...rows[0].map(cec('th')));
+      thead.append(tr);
+      table.append(thead);
+
+      const tbody = cec('tbody')();
+      if (rows.length > 1) {
+        for (let i = 1; i < rows.length; i++) {
+          const tr = cec('tr')();
+          tr.append(...rows[i].map(cec('td')));
+          tbody.append(tr);
+        }
+      }
+      table.append(tbody);
+      return table;
+    };
+
     for (const section of sections) {
       const backButton = section.querySelector('[name=csv_input]');
       backButton.addEventListener('click', (e) => {
@@ -320,33 +315,80 @@
 
         if (data.length == 0) return;
 
-        const cec = (name) => (text) => {
-          const el = document.createElement(name);
-          if (text) el.textContent = text;
-          return el;
-        }
-
-        const table = cec('table')();
-        const thead = cec('thead')();
-        const tr = cec('tr')();
-        tr.append(...data[0].map(cec('th')));
-        thead.append(tr);
-        table.append(thead);
-
-        const tbody = cec('tbody')();
-        if (data.length > 1) {
-          for (let i = 1; i < data.length; i++) {
-            const tr = cec('tr')();
-            tr.append(...data[i].map(cec('td')));
-            tbody.appendChild(tr);
-          }
-        }
-        table.append(tbody);
-
+        const table = build_table(data);
         const superTable = cec('super-table')();
         superTable.append(table);
         csvInput.after(superTable);
         form.closest('section').dataset.stage = 'table';
+      });
+    }
+
+    {
+      const section = document.querySelector('section[data-name=combined]');
+      const button = section.querySelector('button[name=generate]');
+      button.addEventListener('click', (e) => {
+        const nickname_map_table = document.querySelector('section[data-filename=discord_id_to_nickname] super-table');
+        const nickname_headers = [];
+        const id_to_nickname_map = {};
+        if (nickname_map_table) {
+          const nickname_data = nickname_map_table.getData();
+          if (nickname_data[0][0] != 'discordUserId') {
+            alert('unknown nickname table format, expected discordUserId first');
+          } else {
+            nickname_headers.push(...nickname_data[0].slice(1));
+            for (let i = 1; i < nickname_data.length; i++) {
+              const row = nickname_data[i];
+              const id = row[0];
+              id_to_nickname_map[id] = row.slice(1);
+            }
+          }
+        }
+
+        const reactions_table = document.querySelector('section[data-filename=message_reactions] super-table');
+        const reactions = reactions_table.getData();
+        const reaction_headers = reactions[0];
+        const emoji_column = 0;
+        if (reaction_headers[emoji_column] != 'emoji' || reaction_headers[1] != 'discordUserId') {
+          alert('Unknown reaction table format, expected first column to be emoji');
+          return;
+        }
+
+        const emoji_list = [];
+        const emoji_index = {};
+        for (let i = 1; i < reactions.length; i++) {
+          const emoji = reactions[i][emoji_column];
+          if (emoji_index[emoji] == null) {
+            emoji_index[emoji] = emoji_list.length;
+            emoji_list.push(emoji);
+          }
+        }
+
+        const final_headers = reaction_headers.slice(1);
+        final_headers.push(...nickname_headers);
+        final_headers.push(...emoji_list);
+        const empty_nickname = Array(nickname_headers.length).fill('');
+        const empty_emojis = Array(emoji_list.length).fill('');
+        const id_to_row = {};
+        const rows = [final_headers];
+        for (let i = 1; i < reactions.length; i++) {
+          const emoji = reactions[i][emoji_column];
+          const id = reactions[i][1];
+          let row = id_to_row[id];
+          if (!row) {
+            row = reactions[i].slice(1);
+            row.push(...(id_to_nickname_map[id] ?? empty_nickname));
+            row.push(...empty_emojis);
+            id_to_row[id] = row;
+            rows.push(row);
+          }
+          row[final_headers.length - emoji_list.length + emoji_index[emoji]] = '1';
+        }
+
+        const table = build_table(rows);
+        const superTable = cec('super-table')();
+        superTable.append(table);
+        section.querySelector('super-table')?.remove();
+        section.append(superTable);
       });
     }
   </script>

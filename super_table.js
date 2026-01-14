@@ -1,5 +1,7 @@
 import Csv from "./papaparse.js";
 
+// TODO: row count
+
 export class SuperTable extends HTMLElement {
   constructor() {
     super();
