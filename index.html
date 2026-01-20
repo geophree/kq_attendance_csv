@@ -423,11 +423,7 @@
         const data = combined_table.getData();
         const headers = data[0];
         const header_select = cec('select')();
-        header_select.append(...headers.map((e, i) => {
-          const option = cec('option')(e);
-          option.setAttribute('value', i);
-          return option;
-        }));
+        header_select.append(...headers.map(cec('option')));
         {
           const inclusion_column_select = header_select.cloneNode(true);
           inclusion_column_select.setAttribute('name', 'inclusion_column');
@@ -475,13 +471,18 @@
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
         const data = combined_table.getData();
+        const headers = data[0];
+        console.log({headers});
         const data_only = data.slice(1);
         let filter = () => true;
         {
           const inclusion_column_select = section.querySelector('select[name=inclusion_column]');
+          console.log({select_value: inclusion_column_select.value});
           const value = inclusion_column_select.value;
           if (value != '') {
-            filter = (row) => !!row[value];
+            const col_index = headers.indexOf(value);
+            console.log({col_index});
+            filter = (row) => !!row[col_index];
           }
         }
         const ps = section.querySelectorAll('p');
@@ -489,8 +490,10 @@
         const final_headers = [];
         for (let p of ps) {
           const select = p.querySelector('select');
-          const select_value = select.value;
-          col_getters.push((row) => row[select_value]);
+          console.log({select_value: select.value});
+          const col_index = headers.indexOf(select.value);
+          console.log({col_index});
+          col_getters.push((row) => row[col_index]);
           const input = p.querySelector('input');
           const input_value = input.value;
           final_headers.push(input_value ? input_value : input.placeholder);
