@@ -232,6 +232,16 @@
           display: none;
         }
       }
+      &[data-name="reformat"]:not([data-step="start"]) {
+        button[name="select"] {
+          display: none;
+        }
+      }
+      &[data-name="reformat"][data-step="start"] {
+        button[name="reset"], button[name="add"], button[name="generate"] {
+          display: none;
+        }
+      }
     }
   </style>
 </head>
@@ -253,6 +263,14 @@
     </section>
     <section data-name="combined">
       <h2>Combined with Emoji columns</h2>
+      <button name="generate">Generate</button>
+      <!-- TODO: display when it is out of date? -->
+    </section>
+    <section data-name="reformat" data-step="start">
+      <h2>Reformatted for Script</h2>
+      <button name="select">Select Columns</button>
+      <button name="reset">Reset</button>
+      <button name="add" aria-label="add"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
       <button name="generate">Generate</button>
       <!-- TODO: display when it is out of date? -->
     </section>
@@ -391,6 +409,102 @@
         section.append(superTable);
       });
     }
+    {
+      const section = document.querySelector('section[data-name="reformat"]');
+      const select_button = section.querySelector('button[name="select"]');
+      const reset_button = section.querySelector('button[name="reset"]');
+      const add_button = section.querySelector('button[name="add"]');
+      const generate_button = section.querySelector('button[name="generate"]');
+      let add_button_click;
+      select_button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const combined_table =
+          document.querySelector('section[data-name="combined"] super-table');
+        const data = combined_table.getData();
+        const headers = data[0];
+        const header_select = cec('select')();
+        header_select.append(...headers.map((e, i) => {
+          const option = cec('option')(e);
+          option.setAttribute('value', i);
+          return option;
+        }));
+        {
+          const inclusion_column_select = header_select.cloneNode(true);
+          inclusion_column_select.setAttribute('name', 'inclusion_column');
+          const include_all = cec('option')('-- Include all --');
+          include_all.setAttribute('value', '');
+          include_all.setAttribute('selected', true);
+          inclusion_column_select.prepend(include_all);
+          const label = cec('label')('Include if column truthy: ');
+          label.append(inclusion_column_select);
+          reset_button.after(label);
+        }
+        add_button_click = (e) => {
+          e.preventDefault();
+          const p = cec('p')(' renamed to ');
+          const column_select = header_select.cloneNode(true);
+          const input = cec('input')();
+          const column_change = () => {
+            input.placeholder = column_select.options[column_select.selectedIndex].text;
+          };
+          column_select.addEventListener('change', column_change);
+          column_change();
+          const remove = cec('button')();
+          remove.innerHTML = '&#10006;';
+          remove.addEventListener('click', (e) => {
+            e.preventDefault();
+            p.remove();
+          });
+          p.prepend(column_select);
+          p.append(input, ' ', remove);
+          add_button.before(p);
+        };
+        add_button.addEventListener('click', add_button_click);
+        section.dataset.step = 'columns';
+      });
+      reset_button.addEventListener('click', (e) => {
+        e.preventDefault();
+        while (reset_button.nextSibling != add_button) {
+          reset_button.nextSibling.remove();
+        }
+        add_button.removeEventListener('click', add_button_click);
+        section.dataset.step = 'start';
+      });
+      generate_button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const combined_table =
+          document.querySelector('section[data-name="combined"] super-table');
+        const data = combined_table.getData();
+        const data_only = data.slice(1);
+        let filter = () => true;
+        {
+          const inclusion_column_select = section.querySelector('select[name=inclusion_column]');
+          const value = inclusion_column_select.value;
+          if (value != '') {
+            filter = (row) => !!row[value];
+          }
+        }
+        const ps = section.querySelectorAll('p');
+        const col_getters = [];
+        const final_headers = [];
+        for (let p of ps) {
+          const select = p.querySelector('select');
+          const select_value = select.value;
+          col_getters.push((row) => row[select_value]);
+          const input = p.querySelector('input');
+          const input_value = input.value;
+          final_headers.push(input_value ? input_value : input.placeholder);
+        }
+        const final_data = [final_headers];
+        final_data.push(...data_only.filter(filter).map((row) => col_getters.map((f) => f(row))));
+        const table = build_table(final_data);
+        const superTable = cec('super-table')();
+        superTable.dataset.filename = 'attendance';
+        superTable.append(table);
+        section.querySelector('super-table')?.remove();
+        section.append(superTable);
+      });
+    }
   </script>
   <script type="module">
     let localStorage;
@@ -429,6 +543,13 @@
           const csv = superTable.getCsv();
           if (csv) storeData(csv);
         });
+      }
+      if (
+        document.querySelector('section[data-filename=discord_id_to_nickname] super-table')
+        && document.querySelector('section[data-filename=message_reactions] super-table')
+        ) {
+        const generate_button = document.querySelector('section[data-name=combined] button[name=generate]');
+        generate_button.click();
       }
     }
   </script>
