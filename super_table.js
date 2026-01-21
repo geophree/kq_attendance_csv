@@ -71,7 +71,6 @@ export class SuperTable extends HTMLElement {
         const label = cec('label')(header);
         const input = cec('input')();
         input.setAttribute('type', 'text');
-        input.value = 1; // TODO: REMOVE!!!!
         label.append(' ', input);
         return label;
       }));
