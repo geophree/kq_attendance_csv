@@ -106,14 +106,26 @@ export class SuperTable extends HTMLElement {
     });
   }
 
-  getData() {
+  getDataInternal(query) {
     const table = this.querySelector('table');
     if (!table) return;
     const data = [];
-    for (const row of table.querySelectorAll('thead > tr, tbody > tr')) {
+    for (const row of table.querySelectorAll(`:is(${query}) > tr`)) {
       data.push([...row.children].map((el) => el.textContent));
     }
     return data;
+  }
+
+  getHeaderData() {
+    return this.getDataInternal('thead')[0];
+  }
+
+  getBodyData() {
+    return this.getDataInternal('tbody');
+  }
+
+  getData() {
+    return this.getDataInternal('thead, tbody');
   }
 
   getCsv() {

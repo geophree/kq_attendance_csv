@@ -346,60 +346,64 @@
       const button = section.querySelector('button[name=generate]');
       button.addEventListener('click', (e) => {
         const nickname_map_table = document.querySelector('section[data-filename=discord_id_to_nickname] super-table');
-        const nickname_headers = [];
+        let nickname_headers = [];
         const id_to_nickname_map = {};
         if (nickname_map_table) {
-          const nickname_data = nickname_map_table.getData();
-          if (nickname_data[0][0] != 'discordUserId') {
-            alert('unknown nickname table format, expected discordUserId first');
+          const nickname_header_data = nickname_map_table.getHeaderData();
+          let mapping_column = nickname_header_data.indexOf('discordUserId');
+          if (mapping_column < 0) {
+            alert('unknown nickname table format, expected a discordUserId');
           } else {
-            nickname_headers.push(...nickname_data[0].slice(1));
-            for (let i = 1; i < nickname_data.length; i++) {
-              const row = nickname_data[i];
-              const id = row[0];
-              id_to_nickname_map[id] = row.slice(1);
+            nickname_headers =
+              nickname_header_data.toSpliced(mapping_column, 1);
+            const nickname_body_data = nickname_map_table.getBodyData();
+            for (let row of nickname_body_data) {
+              id_to_nickname_map[row[mapping_column]] =
+                row.toSpliced(mapping_column, 1);
             }
           }
         }
 
         const reactions_table = document.querySelector('section[data-filename=message_reactions] super-table');
-        const reactions = reactions_table.getData();
-        const reaction_headers = reactions[0];
-        const emoji_column = 0;
-        if (reaction_headers[emoji_column] != 'emoji' || reaction_headers[1] != 'discordUserId') {
-          alert('Unknown reaction table format, expected first column to be emoji');
+        const reaction_headers = reactions_table.getHeaderData();
+        const emoji_column = reaction_headers.indexOf('emoji');
+        const mapping_column = reaction_headers.indexOf('discordUserId');
+        if (emoji_column < 0 || mapping_column < 0) {
+          alert('Unknown reaction table format, expected emoji and discordUserId columns');
           return;
         }
 
+        const reactions = reactions_table.getBodyData();
         const emoji_list = [];
         const emoji_index = {};
-        for (let i = 1; i < reactions.length; i++) {
-          const emoji = reactions[i][emoji_column];
+        for (let row of reactions) {
+          const emoji = row[emoji_column];
           if (emoji_index[emoji] == null) {
             emoji_index[emoji] = emoji_list.length;
             emoji_list.push(emoji);
           }
         }
 
-        const final_headers = reaction_headers.slice(1);
+        const final_headers = reaction_headers.toSpliced(emoji_column, 1);
         final_headers.push(...nickname_headers);
         final_headers.push(...emoji_list);
         const empty_nickname = Array(nickname_headers.length).fill('');
         const empty_emojis = Array(emoji_list.length).fill('');
         const id_to_row = {};
         const rows = [final_headers];
-        for (let i = 1; i < reactions.length; i++) {
-          const emoji = reactions[i][emoji_column];
-          const id = reactions[i][1];
+        const emoji_index_offset = final_headers.length - emoji_list.length;
+        for (let reaction of reactions) {
+          const emoji = reaction[emoji_column];
+          const id = reaction[mapping_column];
           let row = id_to_row[id];
           if (!row) {
-            row = reactions[i].slice(1);
+            row = reaction.toSpliced(emoji_column, 1);
             row.push(...(id_to_nickname_map[id] ?? empty_nickname));
             row.push(...empty_emojis);
             id_to_row[id] = row;
             rows.push(row);
           }
-          row[final_headers.length - emoji_list.length + emoji_index[emoji]] = '1';
+          row[emoji_index_offset + emoji_index[emoji]] = '1';
         }
 
         const table = build_table(rows);
@@ -420,8 +424,7 @@
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
-        const data = combined_table.getData();
-        const headers = data[0];
+        const headers = combined_table.getHeaderData();
         const header_select = cec('select')();
         header_select.append(...headers.map(cec('option')));
         {
@@ -470,18 +473,14 @@
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
-        const data = combined_table.getData();
-        const headers = data[0];
-        console.log({headers});
-        const data_only = data.slice(1);
+        const headers = combined_table.getHeaderData();
+        const data_only = combined_table.getBodyData();
         let filter = () => true;
         {
           const inclusion_column_select = section.querySelector('select[name=inclusion_column]');
-          console.log({select_value: inclusion_column_select.value});
           const value = inclusion_column_select.value;
           if (value != '') {
             const col_index = headers.indexOf(value);
-            console.log({col_index});
             filter = (row) => !!row[col_index];
           }
         }
@@ -490,9 +489,7 @@
         const final_headers = [];
         for (let p of ps) {
           const select = p.querySelector('select');
-          console.log({select_value: select.value});
           const col_index = headers.indexOf(select.value);
-          console.log({col_index});
           col_getters.push((row) => row[col_index]);
           const input = p.querySelector('input');
           const input_value = input.value;
