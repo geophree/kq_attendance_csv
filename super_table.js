@@ -1,7 +1,5 @@
 import Csv from "./papaparse.js";
 
-// TODO: row count
-
 export class SuperTable extends HTMLElement {
   constructor() {
     super();
@@ -16,17 +14,12 @@ export class SuperTable extends HTMLElement {
       this.append(this.createTable(table));
       actionTable = this.querySelector('action-table');
     }
-    const controls = actionTable.querySelector('form.controls');
-    if (!controls) return;
-    controls.copy.addEventListener('click', async (e) => {
-      const csv = superTable.getCsv();
-      try {
-        await navigator.clipboard.writeText(csv);
-        alert('Copied data to clipboard');
-      } catch {
-        alert('Failed to copy data to clipboard');
-      }
-    });
+
+    const cec = (name) => (text) => {
+      const el = this.ownerDocument.createElement(name);
+      if (text) el.textContent = text;
+      return el;
+    }
 
     actionTable.addEventListener('focusout', (e) => {
       if (!event.target.contentEditable) return;
@@ -41,6 +34,31 @@ export class SuperTable extends HTMLElement {
         const changeEvent = new Event('super-table-updated', { bubbles: true });
         superTable.dispatchEvent(changeEvent);
       }, 0);
+    });
+
+    {
+      const slot = this.querySelector('slot[name="row-count"]');
+      if (slot) {
+        const span = cec('span')();
+        const update = () => {
+          span.textContent = actionTable.rows.length;
+        };
+        this.addEventListener('super-table-updated', update);
+        update();
+        slot.replaceWith(span);
+      }
+    }
+
+    const controls = actionTable.querySelector('form.controls');
+    if (!controls) return;
+    controls.copy.addEventListener('click', async (e) => {
+      const csv = superTable.getCsv();
+      try {
+        await navigator.clipboard.writeText(csv);
+        alert('Copied data to clipboard');
+      } catch {
+        alert('Failed to copy data to clipboard');
+      }
     });
 
     controls.download.addEventListener('click', (e) => {
@@ -60,12 +78,6 @@ export class SuperTable extends HTMLElement {
       const table = actionTable.querySelector('table');
       const ths = table.querySelectorAll('thead th');
       const headers = [...ths].map((el) => el.textContent);
-
-      const cec = (name) => (text) => {
-        const el = this.ownerDocument.createElement(name);
-        if (text) el.textContent = text;
-        return el;
-      }
 
       const dialog = superTable.createDialog(...headers.map(header => {
         const label = cec('label')(header);
@@ -139,7 +151,7 @@ export class SuperTable extends HTMLElement {
       actionTableTemplate.content,
       true
     );
-    actionTable.querySelector('slot').replaceWith(table);
+    actionTable.querySelector('slot:not([name])').replaceWith(table);
     return actionTable;
   }
 
@@ -153,7 +165,7 @@ export class SuperTable extends HTMLElement {
     dialog.querySelector('[name=done]').addEventListener('click', (e) => {
       e.target.closest('dialog').close();
     });
-    dialog.querySelector('slot').replaceWith(...inputs);
+    dialog.querySelector('slot:not([name])').replaceWith(...inputs);
     return dialog;
   }
 }
@@ -162,6 +174,7 @@ const actionTableTemplate = window.document.createElement('template');
 actionTableTemplate.innerHTML = `
   <action-table>
     <div class="title">
+      <slot name="row-count">???</slot> rows
       <action-table-filters>
         <input type="search" name="action-table" placeholder="🔍" aria-label="search table"/>
       </action-table-filters>
