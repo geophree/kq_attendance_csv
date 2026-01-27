@@ -1,7 +1,7 @@
 import Csv from "./papaparse.js";
 
 class ColumnMappingBuilder extends HTMLElement {
-  _columns;
+  _columns = [];
   _columns_changed = true;
 
   constructor() {
@@ -9,37 +9,49 @@ class ColumnMappingBuilder extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['columns'];
+    return ['columns', 'value'];
   }
 
   get columns() {
-    while (this._columns_changed === true) {
-      this._columns_changed = false;
-      if (!this.hasAttribute('columns')) {
-        this._columns = [];
-      } else {
-        try {
-          this._columns = Csv.parse(this.getAttribute('columns')).data[0];
-        } catch (e) {
-          console.error(e);
-          this._columns = [];
-        }
-      }
-    }
     return this._columns;
   }
 
   set columns(val) {
-    if (typeof val === 'string') {
-      this.setAttribute('columns', val);
-    } else {
-      this.setAttribute('columns', Csv.unparse([val]));
+    this._columns = val;
+    for (let select of this.querySelectorAll('select')) {
+      const newChildren = [...this.createColumnSelect(select.value).children];
+      const selected = newChildren.find(e => e.selected);
+      select.replaceChildren(...newChildren);
+      selected.selected = true;
     }
+    this.dispatchEvent(new Event('changed', { bubbles: true }));
+    return this._columns
+  }
+
+  get value() {
+    const val = [];
+    for (let li of this.querySelectorAll('li')) {
+      const select = li.querySelector('select');
+      const input = li.querySelector('input');
+      val.push([select.value, input.value]);
+    }
+    return Csv.unparse(val);
+  }
+
+  set value(val) {
+    const rows = (typeof val === 'string') ? Csv.parse(val).data : []
+    const list = this.querySelector('ol');
+    const cli = (row) => this.createListItem(...row);
+    list.replaceChildren(...rows.map(cli));
+    this.dispatchEvent(new Event('changed', { bubbles: true }));
+    return val;
   }
 
   async attributeChangedCallback(attrName, oldVal, newVal) {
     if (attrName === 'columns') {
-      this._columns_changed = true;
+      this.columns = (typeof newVal === 'string') ? Csv.parse(newVal).data[0] : [];
+    } else if (attrName === 'value') {
+      this.value = newVal;
     }
   }
 
@@ -57,6 +69,11 @@ class ColumnMappingBuilder extends HTMLElement {
     });
   }
 
+  reset() {
+    this.querySelector('ol').replaceChildren();
+    this.dispatchEvent(new Event('changed', { bubbles: true }));
+  }
+
   cec(name) {
     return (text) => {
       const el = this.ownerDocument.createElement(name);
@@ -65,11 +82,11 @@ class ColumnMappingBuilder extends HTMLElement {
     };
   }
 
-  createListItem() {
+  createListItem(selected, name) {
     const frag = this.ownerDocument.importNode(listItemTemplate.content, true);
     const li = frag.querySelector('li');
     const slot = li.querySelector('slot');
-    const column_select = this.createColumnSelect();
+    const column_select = this.createColumnSelect(selected);
     slot.replaceWith(column_select);
     const input = li.querySelector('input');
     const column_change = () => input.placeholder = column_select.value;
@@ -80,14 +97,25 @@ class ColumnMappingBuilder extends HTMLElement {
       e.preventDefault();
       li.remove();
     });
+    if (typeof name === 'string' && name.length > 0) input.value = name;
     return li;
   }
 
-  createColumnSelect() {
+  createColumnSelect(selected) {
     const cec = (...args) => this.cec(...args);
 
     const column_select = cec('select')();
     column_select.append(...this.columns.map(cec('option')));
+    if (typeof selected === 'string' && selected.length > 0) {
+      let option = [...column_select.children]
+        .find((e) => e.textContent === selected);
+      if (!option) {
+        option = this.cec('option')(selected);
+        option.setAttribute('disabled', true);
+        column_select.prepend(option);
+      }
+      option.setAttribute('selected', true);
+    }
     return column_select;
   }
 

@@ -238,7 +238,7 @@
         }
       }
       &[data-name="reformat"][data-step="start"] {
-        button[name="reset"], button[name="add"], button[name="generate"] {
+        form {
           display: none;
         }
       }
@@ -268,9 +268,12 @@
     </section>
     <section data-name="reformat" data-step="start">
       <h2>Reformatted for Script</h2>
-      <button name="select">Select Columns</button>
-      <button name="reset">Reset</button>
-      <button name="generate">Generate</button>
+      <button type="button" name="select">Select Columns</button>
+      <form action="javascript:void(0);">
+        <button type="reset">Reset</button>
+        <column-mapping-builder data-storage-key="reformat-mapper"></column-mapping-builder>
+        <button name="generate">Generate</button>
+      </form>
       <!-- TODO: display when it is out of date? -->
     </section>
   </main>
@@ -416,38 +419,36 @@
     {
       const section = document.querySelector('section[data-name="reformat"]');
       const select_button = section.querySelector('button[name="select"]');
-      const reset_button = section.querySelector('button[name="reset"]');
-      const add_button = section.querySelector('button[name="add"]');
-      const generate_button = section.querySelector('button[name="generate"]');
-      let add_button_click;
+      const form = section.querySelector('form');
+      const mapping_builder = form.querySelector('column-mapping-builder');
+      const reset_button = form.querySelector('button[type="reset"]');
       select_button.addEventListener('click', (e) => {
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
-        const mapping_builder = cec('column-mapping-builder')();
         mapping_builder.columns = combined_table.getHeaderData();
         {
-          const inclusion_column_select = mapping_builder.createColumnSelect();
+          const inclusion_column_select =
+            mapping_builder.createColumnSelect('-- Include all --');
           inclusion_column_select.setAttribute('name', 'inclusion_column');
-          const include_all = cec('option')('-- Include all --');
+          const include_all = inclusion_column_select.firstChild;
           include_all.setAttribute('value', '');
-          include_all.setAttribute('selected', true);
-          inclusion_column_select.prepend(include_all);
+          include_all.disabled = false;
           const label = cec('label')('Include row if column truthy: ');
           label.append(inclusion_column_select);
           reset_button.after(label);
         }
-        generate_button.before(mapping_builder);
         section.dataset.step = 'columns';
       });
-      reset_button.addEventListener('click', (e) => {
+      form.addEventListener('reset', (e) => {
         e.preventDefault();
-        while (reset_button.nextSibling != generate_button) {
+        while (reset_button.nextSibling != mapping_builder) {
           reset_button.nextSibling.remove();
         }
+        mapping_builder.reset();
         section.dataset.step = 'start';
       });
-      generate_button.addEventListener('click', (e) => {
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
@@ -455,14 +456,14 @@
         const data_only = combined_table.getBodyData();
         let filter = () => true;
         {
-          const inclusion_column_select = section.querySelector('select[name=inclusion_column]');
+          const inclusion_column_select = form.inclusion_column;
           const value = inclusion_column_select.value;
           if (value != '') {
             const col_index = headers.indexOf(value);
             filter = (row) => !!row[col_index];
           }
         }
-        const mapping_builder = section.querySelector('column-mapping-builder');
+        const mapping_builder = form.querySelector('column-mapping-builder');
         const { names, mapper } = mapping_builder.getMapperAndNames();
         const final_data = [names];
         final_data.push(...data_only.filter(filter).map(mapper));
@@ -513,12 +514,27 @@
           if (csv) storeData(csv);
         });
       }
+
       if (
         document.querySelector('section[data-filename=discord_id_to_nickname] super-table')
         && document.querySelector('section[data-filename=message_reactions] super-table')
         ) {
         const generate_button = document.querySelector('section[data-name=combined] button[name=generate]');
         generate_button.click();
+      }
+
+      const mapping_builders =
+        document.querySelectorAll('column-mapping-builder[data-storage-key]');
+      for (const mapping_builder of mapping_builders) {
+        const localStorageKey = mapping_builder.dataset.storageKey;
+        mapping_builder.addEventListener('change', (e) => {
+          localStorage.setItem(localStorageKey, mapping_builder.value);
+        });
+        const data = localStorage.getItem(localStorageKey);
+        if (data) {
+          mapping_builder.value = data;
+          mapping_builder.closest('section').querySelector('button[name="select"')?.click();
+        }
       }
     }
   </script>
