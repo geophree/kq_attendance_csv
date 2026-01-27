@@ -270,7 +270,6 @@
       <h2>Reformatted for Script</h2>
       <button name="select">Select Columns</button>
       <button name="reset">Reset</button>
-      <button name="add" aria-label="add"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
       <button name="generate">Generate</button>
       <!-- TODO: display when it is out of date? -->
     </section>
@@ -282,6 +281,7 @@
   </footer>
   <script type="module" src="https://unpkg.com/@colinaut/action-table/dist/index.js"></script>
   <script type="module" src="./super_table.js"></script>
+  <script type="module" src="./column_mapping_builder.js"></script>
   <script type="module" src="./csv_input.js"></script>
   <script type="module">
     // TODO: make sure all rows have the same column count
@@ -424,49 +424,27 @@
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
-        const headers = combined_table.getHeaderData();
-        const header_select = cec('select')();
-        header_select.append(...headers.map(cec('option')));
+        const mapping_builder = cec('column-mapping-builder')();
+        mapping_builder.columns = combined_table.getHeaderData();
         {
-          const inclusion_column_select = header_select.cloneNode(true);
+          const inclusion_column_select = mapping_builder.createColumnSelect();
           inclusion_column_select.setAttribute('name', 'inclusion_column');
           const include_all = cec('option')('-- Include all --');
           include_all.setAttribute('value', '');
           include_all.setAttribute('selected', true);
           inclusion_column_select.prepend(include_all);
-          const label = cec('label')('Include if column truthy: ');
+          const label = cec('label')('Include row if column truthy: ');
           label.append(inclusion_column_select);
           reset_button.after(label);
         }
-        add_button_click = (e) => {
-          e.preventDefault();
-          const p = cec('p')(' renamed to ');
-          const column_select = header_select.cloneNode(true);
-          const input = cec('input')();
-          const column_change = () => {
-            input.placeholder = column_select.options[column_select.selectedIndex].text;
-          };
-          column_select.addEventListener('change', column_change);
-          column_change();
-          const remove = cec('button')();
-          remove.innerHTML = '&#10006;';
-          remove.addEventListener('click', (e) => {
-            e.preventDefault();
-            p.remove();
-          });
-          p.prepend(column_select);
-          p.append(input, ' ', remove);
-          add_button.before(p);
-        };
-        add_button.addEventListener('click', add_button_click);
+        generate_button.before(mapping_builder);
         section.dataset.step = 'columns';
       });
       reset_button.addEventListener('click', (e) => {
         e.preventDefault();
-        while (reset_button.nextSibling != add_button) {
+        while (reset_button.nextSibling != generate_button) {
           reset_button.nextSibling.remove();
         }
-        add_button.removeEventListener('click', add_button_click);
         section.dataset.step = 'start';
       });
       generate_button.addEventListener('click', (e) => {
@@ -484,19 +462,10 @@
             filter = (row) => !!row[col_index];
           }
         }
-        const ps = section.querySelectorAll('p');
-        const col_getters = [];
-        const final_headers = [];
-        for (let p of ps) {
-          const select = p.querySelector('select');
-          const col_index = headers.indexOf(select.value);
-          col_getters.push((row) => row[col_index]);
-          const input = p.querySelector('input');
-          const input_value = input.value;
-          final_headers.push(input_value ? input_value : input.placeholder);
-        }
-        const final_data = [final_headers];
-        final_data.push(...data_only.filter(filter).map((row) => col_getters.map((f) => f(row))));
+        const mapping_builder = section.querySelector('column-mapping-builder');
+        const { names, mapper } = mapping_builder.getMapperAndNames();
+        const final_data = [names];
+        final_data.push(...data_only.filter(filter).map(mapper));
         const table = build_table(final_data);
         const superTable = cec('super-table')();
         superTable.dataset.filename = 'attendance';
