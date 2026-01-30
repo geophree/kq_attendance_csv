@@ -422,54 +422,30 @@
       const form = section.querySelector('form');
       const filter_map = form.querySelector('row-filter-map');
       const reset_button = form.querySelector('button[type="reset"]');
+
       select_button.addEventListener('click', (e) => {
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
         filter_map.columns = combined_table.getHeaderData();
-        {
-          const inclusion_column_select =
-            filter_map.createColumnSelect([]);
-          inclusion_column_select.setAttribute('name', 'inclusion_column');
-          inclusion_column_select.setAttribute('style', 'display: block;');
-          const label = cec('label')
-            ('Include row if any of these columns are truthy: ');
-          label.append(inclusion_column_select);
-          reset_button.after(label);
-        }
         section.dataset.step = 'columns';
       });
+
       form.addEventListener('reset', (e) => {
         e.preventDefault();
-        while (reset_button.nextSibling != filter_map) {
-          reset_button.nextSibling.remove();
-        }
         filter_map.reset();
         section.dataset.step = 'start';
       });
+
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
-        const headers = combined_table.getHeaderData();
         const data_only = combined_table.getBodyData();
-        let filter = () => true;
-        {
-          const inclusion_column_select = form.inclusion_column;
-          const selected = inclusion_column_select.selectedOptions;
-          if (selected.length > 0) {
-            const col_indexes = [];
-            for (const { value } of selected) {
-              const index = headers.indexOf(value);
-              if (index >= 0) col_indexes.push(index);
-            }
-            filter = (row) => col_indexes.some((index) => !!row[index]);
-          }
-        }
         const filter_map = form.querySelector('row-filter-map');
-        const { names, mapper } = filter_map.getMapperAndNames();
+        const { filter, map, names } = filter_map.getFilterMapAndNames();
         const final_data = [names];
-        final_data.push(...data_only.filter(filter).map(mapper));
+        final_data.push(...data_only.filter(filter).map(map));
         const table = build_table(final_data);
         const superTable = cec('super-table')();
         superTable.dataset.filename = 'attendance';
@@ -532,11 +508,18 @@
         const localStorageKey = filter_map.dataset.storageKey;
         filter_map.addEventListener('change', (e) => {
           localStorage.setItem(localStorageKey, filter_map.value);
+          localStorage.setItem(
+            localStorageKey + '-fcv', filter_map.filter_columns_value);
         });
+
         const data = localStorage.getItem(localStorageKey);
-        if (data) {
-          filter_map.value = data;
-          filter_map.closest('section').querySelector('button[name="select"')?.click();
+        if (data) filter_map.value = data;
+
+        const data_fcv = localStorage.getItem(localStorageKey + '-fcv');
+        if (data_fcv) filter_map.filter_columns_value = data_fcv;
+
+        if (data || data_fcv) {
+          filter_map.closest('section').querySelector('button[name="select"]')?.click();
         }
       }
     }

@@ -9,7 +9,7 @@ class RowFilterMap extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['columns', 'value'];
+    return ['columns', 'value', 'filter-columns-value'];
   }
 
   get columns() {
@@ -19,13 +19,35 @@ class RowFilterMap extends HTMLElement {
   set columns(val) {
     this._columns = val;
     for (let select of this.querySelectorAll('select')) {
-      const newChildren = [...this.createColumnSelect(select.value).children];
-      const selected = newChildren.find(e => e.selected);
+      const selected = select.multiple ? [...select.selectedOptions].map((s) => s.value) : select.value;
+      const newChildren = [...this.createColumnSelect(selected).children];
+      const selectedOptions = newChildren.filter(e => e.selected);
       select.replaceChildren(...newChildren);
-      selected.selected = true;
+      select.selectedIndex = -1;
+      for (const option of selectedOptions) {
+        option.selected = true;
+      }
     }
     this.dispatchEvent(new Event('changed', { bubbles: true }));
     return this._columns
+  }
+
+  get filter_columns_value() {
+    const select = this.querySelector('[name=filter_columns]');
+    const val = [...select.selectedOptions].map((s) => s.value);
+    return Csv.unparse([val]);
+  }
+
+  set filter_columns_value(val) {
+    const select = this.querySelector('[name=filter_columns]');
+    const selected = (typeof val === 'string') ? Csv.parse(val).data[0] : [];
+    const newChildren = [...this.createColumnSelect(selected).children];
+    const selectedOptions = newChildren.filter(e => e.selected);
+    select.replaceChildren(...newChildren);
+    select.selectedIndex = -1;
+    for (const option of selectedOptions) {
+      option.selected = true;
+    }
   }
 
   get value() {
@@ -39,7 +61,7 @@ class RowFilterMap extends HTMLElement {
   }
 
   set value(val) {
-    const rows = (typeof val === 'string') ? Csv.parse(val).data : []
+    const rows = (typeof val === 'string') ? Csv.parse(val).data : [];
     const list = this.querySelector('ol');
     const cli = (row) => this.createListItem(...row);
     list.replaceChildren(...rows.map(cli));
@@ -52,6 +74,8 @@ class RowFilterMap extends HTMLElement {
       this.columns = (typeof newVal === 'string') ? Csv.parse(newVal).data[0] : [];
     } else if (attrName === 'value') {
       this.value = newVal;
+    } else if (attrName === 'filter-columns-value') {
+      this.filter_columns_value = newVal;
     }
   }
 
@@ -71,6 +95,7 @@ class RowFilterMap extends HTMLElement {
 
   reset() {
     this.querySelector('ol').replaceChildren();
+    this.querySelector('select').selectedIndex = -1;
     this.dispatchEvent(new Event('changed', { bubbles: true }));
   }
 
@@ -130,25 +155,48 @@ class RowFilterMap extends HTMLElement {
     return column_select;
   }
 
-  getMapperAndNames() {
+  getFilterMapAndNames() {
     const columns = this.columns;
-    const indexes = [];
     const names = [];
 
-    for (let li of this.querySelectorAll('li')) {
-      const select = li.querySelector('select');
-      indexes.push(columns.indexOf(select.value));
-      const input = li.querySelector('input');
-      const input_value = input.value;
-      names.push(input_value ? input_value : input.placeholder);
+    let map;
+    {
+      const indexes = [];
+      for (let li of this.querySelectorAll('li')) {
+        const select = li.querySelector('select');
+        indexes.push(columns.indexOf(select.value));
+        const input = li.querySelector('input');
+        const input_value = input.value;
+        names.push(input_value ? input_value : input.placeholder);
+      }
+      map = (row) => indexes.map((i) => row[i]);
     }
-    const mapper = (row) => indexes.map((i) => row[i]);
-    return { names, mapper };
+
+    let filter = () => true;
+    {
+      const filter_columns = this.querySelector('[name="filter_columns"]');
+      const selected = filter_columns.selectedOptions;
+      if (selected.length > 0) {
+        const indexes = [];
+        for (const { value } of selected) {
+          const index = columns.indexOf(value);
+          if (index >= 0) indexes.push(index);
+        }
+        filter = (row) => indexes.some((index) => !!row[index]);
+      }
+    }
+
+    return { filter, map, names };
   }
 }
 
 const formTemplate = window.document.createElement('template');
 formTemplate.innerHTML = `
+  <label>
+    Include row if any of these columns are truthy:
+    <select multiple name="filter_columns" style="display: block;"></select>
+  </label>
+  <p>Columns to map:</p>
   <ol style="list-style: none;"></ol>
   <button type="button" name="add" aria-label="add"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
 `;
