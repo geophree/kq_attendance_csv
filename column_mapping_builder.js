@@ -105,16 +105,27 @@ class ColumnMappingBuilder extends HTMLElement {
     const cec = (...args) => this.cec(...args);
 
     const column_select = cec('select')();
+    if (Array.isArray(selected)) {
+      column_select.setAttribute('multiple', '');
+    } else if (typeof selected === 'string' && selected.length > 0) {
+      selected = [selected];
+    }
     column_select.append(...this.columns.map(cec('option')));
-    if (typeof selected === 'string' && selected.length > 0) {
-      let option = [...column_select.children]
-        .find((e) => e.textContent === selected);
-      if (!option) {
-        option = this.cec('option')(selected);
-        option.setAttribute('disabled', true);
-        column_select.prepend(option);
+    if (Array.isArray(selected)) {
+      const options = [...column_select.children];
+      const new_options = [];
+      for (const sel of selected) {
+        if (typeof sel === 'string' && sel.length > 0) {
+          let option = options.find((e) => e.textContent === sel);
+          if (!option) {
+            option = this.cec('option')(sel);
+            option.setAttribute('disabled', '');
+            new_options.push(option);
+          }
+          option.setAttribute('selected', '');
+        }
       }
-      option.setAttribute('selected', true);
+      column_select.prepend(...new_options);
     }
     return column_select;
   }

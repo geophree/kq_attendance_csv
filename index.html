@@ -429,12 +429,11 @@
         mapping_builder.columns = combined_table.getHeaderData();
         {
           const inclusion_column_select =
-            mapping_builder.createColumnSelect('-- Include all --');
+            mapping_builder.createColumnSelect([]);
           inclusion_column_select.setAttribute('name', 'inclusion_column');
-          const include_all = inclusion_column_select.firstChild;
-          include_all.setAttribute('value', '');
-          include_all.disabled = false;
-          const label = cec('label')('Include row if column truthy: ');
+          inclusion_column_select.setAttribute('style', 'display: block;');
+          const label = cec('label')
+            ('Include row if any of these columns are truthy: ');
           label.append(inclusion_column_select);
           reset_button.after(label);
         }
@@ -457,10 +456,14 @@
         let filter = () => true;
         {
           const inclusion_column_select = form.inclusion_column;
-          const value = inclusion_column_select.value;
-          if (value != '') {
-            const col_index = headers.indexOf(value);
-            filter = (row) => !!row[col_index];
+          const selected = inclusion_column_select.selectedOptions;
+          if (selected.length > 0) {
+            const col_indexes = [];
+            for (const { value } of selected) {
+              const index = headers.indexOf(value);
+              if (index >= 0) col_indexes.push(index);
+            }
+            filter = (row) => col_indexes.some((index) => !!row[index]);
           }
         }
         const mapping_builder = form.querySelector('column-mapping-builder');
