@@ -1,6 +1,6 @@
 import Csv from "./papaparse.js";
 
-class ColumnMappingBuilder extends HTMLElement {
+class RowFilterMap extends HTMLElement {
   _columns = [];
   _columns_changed = true;
 
@@ -158,4 +158,4 @@ listItemTemplate.innerHTML = `
   <li><slot></slot> renamed to <input /> <button type="button">&#10006;</button></li>
 `;
 
-window.customElements.define('column-mapping-builder', ColumnMappingBuilder);
+window.customElements.define('row-filter-map', RowFilterMap);

@@ -271,7 +271,7 @@
       <button type="button" name="select">Select Columns</button>
       <form action="javascript:void(0);">
         <button type="reset">Reset</button>
-        <column-mapping-builder data-storage-key="reformat-mapper"></column-mapping-builder>
+        <row-filter-map data-storage-key="reformat-mapper"></row-filter-map>
         <button name="generate">Generate</button>
       </form>
       <!-- TODO: display when it is out of date? -->
@@ -284,7 +284,7 @@
   </footer>
   <script type="module" src="https://unpkg.com/@colinaut/action-table/dist/index.js"></script>
   <script type="module" src="./super_table.js"></script>
-  <script type="module" src="./column_mapping_builder.js"></script>
+  <script type="module" src="./row_filter_map.js"></script>
   <script type="module" src="./csv_input.js"></script>
   <script type="module">
     // TODO: make sure all rows have the same column count
@@ -420,16 +420,16 @@
       const section = document.querySelector('section[data-name="reformat"]');
       const select_button = section.querySelector('button[name="select"]');
       const form = section.querySelector('form');
-      const mapping_builder = form.querySelector('column-mapping-builder');
+      const filter_map = form.querySelector('row-filter-map');
       const reset_button = form.querySelector('button[type="reset"]');
       select_button.addEventListener('click', (e) => {
         e.preventDefault();
         const combined_table =
           document.querySelector('section[data-name="combined"] super-table');
-        mapping_builder.columns = combined_table.getHeaderData();
+        filter_map.columns = combined_table.getHeaderData();
         {
           const inclusion_column_select =
-            mapping_builder.createColumnSelect([]);
+            filter_map.createColumnSelect([]);
           inclusion_column_select.setAttribute('name', 'inclusion_column');
           inclusion_column_select.setAttribute('style', 'display: block;');
           const label = cec('label')
@@ -441,10 +441,10 @@
       });
       form.addEventListener('reset', (e) => {
         e.preventDefault();
-        while (reset_button.nextSibling != mapping_builder) {
+        while (reset_button.nextSibling != filter_map) {
           reset_button.nextSibling.remove();
         }
-        mapping_builder.reset();
+        filter_map.reset();
         section.dataset.step = 'start';
       });
       form.addEventListener('submit', (e) => {
@@ -466,8 +466,8 @@
             filter = (row) => col_indexes.some((index) => !!row[index]);
           }
         }
-        const mapping_builder = form.querySelector('column-mapping-builder');
-        const { names, mapper } = mapping_builder.getMapperAndNames();
+        const filter_map = form.querySelector('row-filter-map');
+        const { names, mapper } = filter_map.getMapperAndNames();
         const final_data = [names];
         final_data.push(...data_only.filter(filter).map(mapper));
         const table = build_table(final_data);
@@ -526,17 +526,17 @@
         generate_button.click();
       }
 
-      const mapping_builders =
-        document.querySelectorAll('column-mapping-builder[data-storage-key]');
-      for (const mapping_builder of mapping_builders) {
-        const localStorageKey = mapping_builder.dataset.storageKey;
-        mapping_builder.addEventListener('change', (e) => {
-          localStorage.setItem(localStorageKey, mapping_builder.value);
+      const row_filter_maps =
+        document.querySelectorAll('row-filter-map[data-storage-key]');
+      for (const filter_map of row_filter_maps) {
+        const localStorageKey = filter_map.dataset.storageKey;
+        filter_map.addEventListener('change', (e) => {
+          localStorage.setItem(localStorageKey, filter_map.value);
         });
         const data = localStorage.getItem(localStorageKey);
         if (data) {
-          mapping_builder.value = data;
-          mapping_builder.closest('section').querySelector('button[name="select"')?.click();
+          filter_map.value = data;
+          filter_map.closest('section').querySelector('button[name="select"')?.click();
         }
       }
     }
