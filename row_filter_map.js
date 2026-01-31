@@ -28,7 +28,6 @@ class RowFilterMap extends HTMLElement {
         option.selected = true;
       }
     }
-    this.dispatchEvent(new Event('changed', { bubbles: true }));
     return this._columns
   }
 
@@ -48,6 +47,7 @@ class RowFilterMap extends HTMLElement {
     for (const option of selectedOptions) {
       option.selected = true;
     }
+    this.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   get value() {
@@ -65,7 +65,7 @@ class RowFilterMap extends HTMLElement {
     const list = this.querySelector('ol');
     const cli = (row) => this.createListItem(...row);
     list.replaceChildren(...rows.map(cli));
-    this.dispatchEvent(new Event('changed', { bubbles: true }));
+    this.dispatchEvent(new Event('change', { bubbles: true }));
     return val;
   }
 
@@ -96,7 +96,7 @@ class RowFilterMap extends HTMLElement {
   reset() {
     this.querySelector('ol').replaceChildren();
     this.querySelector('select').selectedIndex = -1;
-    this.dispatchEvent(new Event('changed', { bubbles: true }));
+    this.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   cec(name) {
@@ -197,7 +197,7 @@ formTemplate.innerHTML = `
     <select multiple name="filter_columns" style="display: block;"></select>
   </label>
   <p>Columns to map:</p>
-  <ol style="list-style: none;"></ol>
+  <ol style="list-style: none; padding-left: 0;"></ol>
   <button type="button" name="add" aria-label="add"><svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 448 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M256 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 160-160 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l160 0 0 160c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160 160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-160 0 0-160z"/></svg></button>
 `;
 

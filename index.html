@@ -512,10 +512,11 @@
             localStorageKey + '-fcv', filter_map.filter_columns_value);
         });
 
+        // get them both so our change handler doesn't overwrite the second.
         const data = localStorage.getItem(localStorageKey);
-        if (data) filter_map.value = data;
-
         const data_fcv = localStorage.getItem(localStorageKey + '-fcv');
+
+        if (data) filter_map.value = data;
         if (data_fcv) filter_map.filter_columns_value = data_fcv;
 
         if (data || data_fcv) {
