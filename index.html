@@ -7,6 +7,14 @@
   <!-- from http://github.com/kevquirk/simple.css -->
   <link rel="stylesheet" href="https://unpkg.com/simpledotcss/simple.css" />
   <style>
+    /* From simple.css */
+    :root {
+      --root-accent: #0d47a1;
+      @media (prefers-color-scheme: dark) {
+        --root-accent: #ffb300;
+      }
+    }
+
     /* make the GitHub icon a normal size */
     .icon {
         vertical-align: sub;
@@ -217,26 +225,27 @@
 
     /* section styling */
     main > section {
-      &:nth-of-type(1) {
+      &:nth-child(1) {
         --sibling-index: 1;
       }
-      &:nth-of-type(2) {
+      &:nth-child(2) {
         --sibling-index: 2;
       }
-      &:nth-of-type(3) {
+      &:nth-child(3) {
         --sibling-index: 3;
       }
-      &:nth-of-type(4) {
+      &:nth-child(4) {
         --sibling-index: 4;
       }
-      &:nth-of-type(5) {
+      &:nth-child(5) {
         --sibling-index: 5;
       }
-      &:nth-of-type(6) {
+      &:nth-child(6) {
         --sibling-index: 6;
       }
+      --accent: oklch(from var(--root-accent) l c calc(h + calc(calc(var(--sibling-index) - 1) * 100)));
       > h2 {
-        color: oklch(from var(--accent) l c calc(h + calc(calc(var(--sibling-index) - 1) * 100)));
+        color: var(--accent);
       }
     }
 
