@@ -476,6 +476,7 @@
           document.querySelector('section[data-name="combined"] super-table');
         const data_only = combined_table.getBodyData();
         const filter_map = form.querySelector('row-filter-map');
+        filter_map.columns = combined_table.getHeaderData();
         const { filter, map, names } = filter_map.getFilterMapAndNames();
         const final_data = [names];
         final_data.push(...data_only.filter(filter).map(map));
