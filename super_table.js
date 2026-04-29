@@ -21,19 +21,16 @@ export class SuperTable extends HTMLElement {
       return el;
     }
 
-    actionTable.addEventListener('focusout', (e) => {
-      if (!event.target.contentEditable) return;
+    const superTableUpdated = () => {
       setTimeout(() => {
         const changeEvent = new Event('super-table-updated', { bubbles: true });
         superTable.dispatchEvent(changeEvent);
       }, 0);
-    });
+    };
 
-    actionTable.addEventListener('action-table-update', (e) => {
-      setTimeout(() => {
-        const changeEvent = new Event('super-table-updated', { bubbles: true });
-        superTable.dispatchEvent(changeEvent);
-      }, 0);
+    actionTable.addEventListener('action-table-update', superTableUpdated);
+    actionTable.addEventListener('focusout', (e) => {
+      if (event.target.contentEditable) superTableUpdated();
     });
 
     {
@@ -116,6 +113,7 @@ export class SuperTable extends HTMLElement {
         cell.contentEditable = contentEditableValue;
       }
     });
+    superTableUpdated();
   }
 
   getDataInternal(query) {

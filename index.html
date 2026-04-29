@@ -454,13 +454,19 @@
       const select_button = section.querySelector('button[name="select"]');
       const form = section.querySelector('form');
       const filter_map = form.querySelector('row-filter-map');
-      const reset_button = form.querySelector('button[type="reset"]');
+      const combined_section =
+        document.querySelector('section[data-name="combined"]');
+
+
+      const updateColumns = () => {
+        const combined_table = combined_section.querySelector('super-table');
+        filter_map.columns = combined_table?.getHeaderData() ?? [];
+      };
+      combined_section.addEventListener('super-table-updated', updateColumns);
+      updateColumns();
 
       select_button.addEventListener('click', (e) => {
         e.preventDefault();
-        const combined_table =
-          document.querySelector('section[data-name="combined"] super-table');
-        filter_map.columns = combined_table.getHeaderData();
         section.dataset.step = 'columns';
       });
 
@@ -472,11 +478,8 @@
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const combined_table =
-          document.querySelector('section[data-name="combined"] super-table');
+        const combined_table = combined_section.querySelector('super-table');
         const data_only = combined_table.getBodyData();
-        const filter_map = form.querySelector('row-filter-map');
-        filter_map.columns = combined_table.getHeaderData();
         const { filter, map, names } = filter_map.getFilterMapAndNames();
         const final_data = [names];
         final_data.push(...data_only.filter(filter).map(map));
